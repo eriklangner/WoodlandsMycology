@@ -1,0 +1,23 @@
+{% extends "woodlandsmushrooms/base.html" %}
+
+{% block content %}
+
+Mushroom Details
+<br>
+
+Mushrooms found: {{ mushrooms_detail.count }}
+
+{% for MushroomDetail in mushrooms_detail %}
+<a href="{% url 'blog:detail' MushroomDetail.id %}"><h2>{{ MushroomDetail.title }}</h2></a>
+<p>{{ MushroomDetail.date }}</p>
+<p>{{ MushroomDetail.description |striptags| truncatechars:100 }}</p>
+<p>{{ MushroomDetail.latin_name }}</p>
+<img src="{{ MushroomDetail.image.url }}">
+<br>
+{% if MushroomDetail.url %}
+<a href="{{ MushroomDetail.url }}"> Link </a>
+{% endif %}
+
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "woodlandsmushrooms/base.html" %}
+
+{% block content %}
+<h1> {{ blog.title }} </h1>
+
+<br>
+<img src="{{ blog.image.url }}">
+<br>
+<a href="{{ blog.url }}"> Link </a>
+<br>
+{{ blog.latin_name }}
+<br>
+{{ blog.description|safe }}
+<br>
+{{ blog.date }}
+
+{% endblock %}

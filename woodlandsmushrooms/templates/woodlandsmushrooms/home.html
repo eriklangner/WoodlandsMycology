@@ -1,0 +1,45 @@
+
+{% extends "woodlandsmushrooms/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+
+
+
+
+<div class="row justify-content-center my-3">
+  <div class="col-5">
+    <img src="{% static 'woodlandsmushrooms/YggdrasilMushroom.jpeg' %}" class="img-fluid">
+  </div>
+</div>
+
+<div class="row justify-content-center mb-3">
+  <div class="col-md-12 text-center">
+    <h3 id="hometext" class="font-weight-bold">Mushrooms of The Woodlands, TX</h3>
+  </div>
+</div>
+
+<h2 class="mt-5">Mushrooms</h2>
+<hr>
+<div class="row">
+
+
+{% for Mushroom in mushrooms %}
+  <div class="col-lg-4 col-md-6">
+
+<h2>{{ Mushroom.title }}</h2>
+<p>{{ Mushroom.description }}</p>
+<img src="{{ Mushroom.image.url }}">
+<br>
+{% if Mushroom.url %}
+<a href="{{ Mushroom.url }}"> Link </a>
+{% endif %}
+
+    </div>
+{% endfor %}
+</div>
+
+{% endblock %}
