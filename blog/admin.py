@@ -1,7 +1,15 @@
 from django.contrib import admin
-from .models import MushroomDetail
+from .models import MushroomDetail, MushroomPhoto
 
 
-admin.site.register(MushroomDetail)
+class MushroomPhotoInline(admin.TabularInline):
+    model = MushroomPhoto
+    extra = 4
 
-# Register your models here.
+
+class MushroomDetailAdmin(admin.ModelAdmin):
+    inlines = [MushroomPhotoInline]
+    list_display = ('title', 'latin_name', 'date')
+
+
+admin.site.register(MushroomDetail, MushroomDetailAdmin)

@@ -32,7 +32,7 @@
 
 <h2>{{ Mushroom.title }}</h2>
 <p>{{ Mushroom.description }}</p>
-<img src="{{ Mushroom.image.url }}">
+<img src="{{ Mushroom.image.url }}" alt="" style="width:100%; aspect-ratio:1/1; object-fit:cover;">
 <br>
 {% if Mushroom.url %}
 <a href="{{ Mushroom.url }}"> Link </a>
