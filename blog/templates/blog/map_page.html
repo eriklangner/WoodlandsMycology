@@ -21,8 +21,10 @@
 
             // Add markers
         {% for MushroomDetail in MushroomDetails %}
+        {% if MushroomDetail.latitude is not None and MushroomDetail.longitude is not None %}
         L.marker([{{ MushroomDetail.latitude }}, {{ MushroomDetail.longitude }}]).addTo(map)
-            .bindPopup('{{ MushroomDetail.title }}', '{{MushroomDetail.url}}');
+            .bindPopup('{{ MushroomDetail.title|escapejs }}');
+        {% endif %}
         {% endfor %}
     </script>
 </body>

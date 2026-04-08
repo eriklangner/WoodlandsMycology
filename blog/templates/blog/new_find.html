@@ -1,0 +1,50 @@
+{% extends "woodlandsmushrooms/base.html" %}
+
+{% block content %}
+<div class="new-find py-3">
+  <h1 class="h3 mb-4">Add mushroom find</h1>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" action="{% url 'blog:new_find' %}" enctype="multipart/form-data" class="new-find-form">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="id_title" class="font-weight-bold">Title</label>
+      <input type="text" name="title" id="id_title" class="form-control form-control-lg" required maxlength="200" placeholder="Common name or short label" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="id_latin_name" class="font-weight-bold">Latin name</label>
+      <input type="text" name="latin_name" id="id_latin_name" class="form-control form-control-lg" required maxlength="150" placeholder="Genus species" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="id_description" class="font-weight-bold">Description</label>
+      <textarea name="description" id="id_description" class="form-control form-control-lg" rows="6" placeholder="Habitat, features, notes…"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="id_date" class="font-weight-bold">Date</label>
+      <input type="date" name="date" id="id_date" class="form-control form-control-lg" value="{{ today|date:'Y-m-d' }}">
+    </div>
+
+    <div class="form-group">
+      <label for="id_photos" class="font-weight-bold">Photos</label>
+      <input type="file" name="photos" id="id_photos" class="form-control-file border rounded p-3" style="font-size:1.1rem;" multiple accept="image/*" capture="environment" required>
+      <small class="form-text text-muted">Select one or more images. On iPhone, the rear camera opens when supported.</small>
+    </div>
+
+    <button type="submit" class="btn btn-success btn-lg btn-block py-3 mt-4 font-weight-bold">Add Mushroom Find</button>
+  </form>
+</div>
+{% endblock %}

@@ -35,16 +35,21 @@
       <div class="collapse navbar-collapse text-center" id="navbarNav">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link" href="http://127.0.0.1:8000/blog/about/">About</a>
+            <a class="nav-link" href="{% url 'blog:about' %}">About</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="https://www.eriklangner.com" target="_blank">Erik Langner</a>
+            <a class="nav-link" href="https://www.eriklangner.com" target="_blank" rel="noopener noreferrer">Erik Langner</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href ='http://127.0.0.1:8000/blog/map/'>Map View</a>
+            <a class="nav-link" href="{% url 'blog:map_page' %}">Map View</a>
           </li>
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link font-weight-bold" href="{% url 'blog:new_find' %}">+ New Find</a>
+          </li>
+          {% endif %}
           <li>
-            <a role="button" href = '{% url 'blog:all_blogs' %}' class="btn btn-primary">Blog</a>
+            <a role="button" href="{% url 'blog:all_blogs' %}" class="btn btn-primary">Blog</a>
           </li>
         </ul>
       </div>
