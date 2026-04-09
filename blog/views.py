@@ -1,8 +1,10 @@
 import datetime
 import base64
+import io
 import os
 import re
 import anthropic
+from PIL import Image
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -133,9 +135,19 @@ def identify(request):
             {'type': 'text', 'text': 'Please identify the mushroom(s) in these photos.'}
         ]
         for photo in photos:
-            image_bytes = photo.read()
+            img = Image.open(photo)
+            max_size = 1200
+            ratio = min(max_size / img.width, max_size / img.height, 1.0)
+            if ratio < 1.0:
+                new_size = (int(img.width * ratio), int(img.height * ratio))
+                img = img.resize(new_size, Image.LANCZOS)
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            buffer = io.BytesIO()
+            img.save(buffer, format='JPEG', quality=85)
+            image_bytes = buffer.getvalue()
             encoded = base64.b64encode(image_bytes).decode('utf-8')
-            media_type = photo.content_type or 'image/jpeg'
+            media_type = 'image/jpeg'
             content_blocks.append(
                 {
                     'type': 'image',
