@@ -1,5 +1,77 @@
 {% extends "woodlandsmushrooms/base.html" %}
 
+{% block extra_js %}
+<script>
+  function getCookie(name) {
+    const cookies = document.cookie ? document.cookie.split(';') : [];
+    for (let i = 0; i < cookies.length; i += 1) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        return decodeURIComponent(cookie.substring(name.length + 1));
+      }
+    }
+    return null;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const identifyButton = document.getElementById('identify-ai-btn');
+    const photosInput = document.getElementById('id_photos');
+    const resultWrap = document.getElementById('ai-result');
+    const resultText = document.getElementById('ai-result-text');
+    const latinNameInput = document.getElementById('id_latin_name');
+    const hiddenAiField = document.getElementById('id_ai_identification');
+    const defaultButtonText = identifyButton.textContent;
+
+    identifyButton.addEventListener('click', async function () {
+      if (!photosInput.files || photosInput.files.length === 0) {
+        alert('Please select at least one photo first.');
+        return;
+      }
+
+      identifyButton.disabled = true;
+      identifyButton.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>Identifying...';
+      resultWrap.style.display = 'block';
+      resultText.textContent = 'Analyzing photos with AI...';
+      resultWrap.className = 'alert alert-info mt-3';
+
+      const formData = new FormData();
+      for (let i = 0; i < photosInput.files.length; i += 1) {
+        formData.append('photos', photosInput.files[i]);
+      }
+
+      try {
+        const response = await fetch("{% url 'blog:identify' %}", {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+          }
+        });
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Identification failed.');
+        }
+
+        resultWrap.className = 'alert alert-success mt-3';
+        resultText.textContent = data.identification || 'No identification text returned.';
+        hiddenAiField.value = data.identification || '';
+
+        if (data.latin_name && !latinNameInput.value.trim()) {
+          latinNameInput.value = data.latin_name;
+        }
+      } catch (error) {
+        resultWrap.className = 'alert alert-danger mt-3';
+        resultText.textContent = error.message || 'Something went wrong.';
+      } finally {
+        identifyButton.disabled = false;
+        identifyButton.textContent = defaultButtonText;
+      }
+    });
+  });
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="new-find py-3">
   <h1 class="h3 mb-4">Add mushroom find</h1>
@@ -17,6 +89,7 @@
 
   <form method="post" action="{% url 'blog:new_find' %}" enctype="multipart/form-data" class="new-find-form">
     {% csrf_token %}
+    <input type="hidden" name="ai_identification" id="id_ai_identification">
 
     <div class="form-group">
       <label for="id_title" class="font-weight-bold">Title</label>
@@ -42,6 +115,11 @@
       <label for="id_photos" class="font-weight-bold">Photos</label>
       <input type="file" name="photos" id="id_photos" class="form-control-file border rounded p-3" style="font-size:1.1rem;" multiple accept="image/*" required>
       <small class="form-text text-muted">Select one or more images. On iPhone, the rear camera opens when supported.</small>
+      <button type="button" id="identify-ai-btn" class="btn btn-outline-primary btn-lg btn-block mt-3">Identify with AI</button>
+      <div id="ai-result" class="alert alert-info mt-3" style="display:none;">
+        <strong>AI Identification</strong>
+        <div id="ai-result-text" class="mt-2"></div>
+      </div>
     </div>
 
     <button type="submit" class="btn btn-success btn-lg btn-block py-3 mt-4 font-weight-bold">Add Mushroom Find</button>

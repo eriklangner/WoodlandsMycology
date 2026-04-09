@@ -12,6 +12,7 @@ class MushroomDetail(models.Model):
     url = models.URLField(blank=True)
     latitude = models.FloatField(null=True, blank=True, default=0)
     longitude = models.FloatField(null=True, blank=True, default=0)
+    ai_identification = models.TextField(blank=True, default='')
 
     def cover_photo(self):
         return self.photos.first()

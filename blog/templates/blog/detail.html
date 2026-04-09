@@ -51,6 +51,15 @@
 <br>
 <a href="{{ blog.url }}"> Link </a>
 <br>
+{% if blog.ai_identification %}
+<div class="card mt-3 mb-3">
+  <div class="card-header">🤖 AI Identification</div>
+  <div class="card-body">
+    {{ blog.ai_identification|linebreaks }}
+    <small class="text-muted">AI-assisted identification. Always verify with an expert before handling or consuming wild mushrooms.</small>
+  </div>
+</div>
+{% endif %}
 {{ blog.latin_name }}
 <br>
 {{ blog.description|safe }}
