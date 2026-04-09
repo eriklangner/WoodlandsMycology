@@ -256,6 +256,8 @@ def new_find(request):
 
         for i, f in enumerate(photos):
             f.seek(0)
+            if i == 0:
+                photos[0].seek(0)
             MushroomPhoto.objects.create(
                 mushroom=mushroom,
                 image=f,
