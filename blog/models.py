@@ -8,7 +8,7 @@ class MushroomDetail(models.Model):
     date = models.DateField(("Date"), default=datetime.date.today)
     latin_name = models.CharField(max_length=150)
     description = models.TextField()
-    image = models.ImageField(upload_to='woodlandsmushrooms/images/')
+    image = models.ImageField(upload_to='woodlandsmushrooms/images/', blank=True, null=True)
     url = models.URLField(blank=True)
     latitude = models.FloatField(null=True, blank=True, default=0)
     longitude = models.FloatField(null=True, blank=True, default=0)

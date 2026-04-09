@@ -242,22 +242,16 @@ def new_find(request):
         except ValueError:
             find_date = today
 
-        for f in photos:
-            f.seek(0)
-
         mushroom = MushroomDetail.objects.create(
             title=title,
             latin_name=latin_name,
             description=description,
             ai_identification=ai_identification,
             date=find_date,
-            image=photos[0],
         )
 
         for i, f in enumerate(photos):
             f.seek(0)
-            if i == 0:
-                photos[0].seek(0)
             MushroomPhoto.objects.create(
                 mushroom=mushroom,
                 image=f,
