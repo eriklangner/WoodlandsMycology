@@ -22,6 +22,12 @@ IDENTIFY_SYSTEM_PROMPT = (
     "before handling or consuming any wild mushroom."
 )
 
+IDENTIFY_MODEL_FALLBACKS = [
+    'claude-3-5-sonnet-latest',
+    'claude-3-5-haiku-latest',
+    'claude-3-haiku-20240307',
+]
+
 
 def _extract_latin_name(text):
     labeled = re.search(
@@ -114,17 +120,35 @@ def identify(request):
             )
 
         client = anthropic.Anthropic(api_key=api_key)
-        response = client.messages.create(
-            model='claude-3-5-sonnet-latest',
-            max_tokens=900,
-            system=IDENTIFY_SYSTEM_PROMPT,
-            messages=[
+        response = None
+        model_errors = []
+        for model_name in IDENTIFY_MODEL_FALLBACKS:
+            try:
+                response = client.messages.create(
+                    model=model_name,
+                    max_tokens=900,
+                    system=IDENTIFY_SYSTEM_PROMPT,
+                    messages=[
+                        {
+                            'role': 'user',
+                            'content': content_blocks,
+                        }
+                    ],
+                )
+                break
+            except Exception as model_exc:
+                model_errors.append(f'{model_name}: {model_exc}')
+
+        if response is None:
+            return JsonResponse(
                 {
-                    'role': 'user',
-                    'content': content_blocks,
-                }
-            ],
-        )
+                    'success': False,
+                    'identification': '',
+                    'latin_name': '',
+                    'error': 'All model fallbacks failed. ' + ' | '.join(model_errors),
+                },
+                status=502,
+            )
 
         identification_text = ""
         for block in response.content:
