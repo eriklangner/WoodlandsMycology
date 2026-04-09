@@ -12,7 +12,11 @@ Mushrooms found: {{ mushrooms_detail.count }}
 <p>{{ MushroomDetail.date }}</p>
 <p>{{ MushroomDetail.description |striptags| truncatechars:100 }}</p>
 <p>{{ MushroomDetail.latin_name }}</p>
-<img src="{{ MushroomDetail.image.url }}">
+{% with MushroomDetail.photos.first as cover %}
+  {% if cover %}
+    <img src="{{ cover.image.url }}" style="width:100%; aspect-ratio:1/1; object-fit:cover;">
+  {% endif %}
+{% endwith %}
 <br>
 {% if MushroomDetail.url %}
 <a href="{{ MushroomDetail.url }}"> Link </a>
