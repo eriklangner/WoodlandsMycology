@@ -22,10 +22,12 @@ IDENTIFY_SYSTEM_PROMPT = (
     "before handling or consuming any wild mushroom."
 )
 
-IDENTIFY_MODEL_FALLBACKS = [
-    'claude-3-5-sonnet-latest',
-    'claude-3-5-haiku-latest',
+PREFERRED_IDENTIFY_MODELS = [
+    'claude-3-5-sonnet-20241022',
+    'claude-3-5-sonnet-20240620',
+    'claude-3-5-haiku-20241022',
     'claude-3-haiku-20240307',
+    'claude-3-opus-20240229',
 ]
 
 
@@ -42,6 +44,32 @@ def _extract_latin_name(text):
     if binomial:
         return binomial.group(1).strip()
     return ""
+
+
+def _select_available_model(client):
+    """
+    Choose a model that actually exists for this API key/account.
+    Returns (model_name, available_model_ids).
+    """
+    available_ids = []
+    try:
+        model_page = client.models.list(limit=50)
+        for model in model_page.data:
+            model_id = getattr(model, 'id', None)
+            if model_id:
+                available_ids.append(model_id)
+    except Exception:
+        return None, []
+
+    for preferred in PREFERRED_IDENTIFY_MODELS:
+        if preferred in available_ids:
+            return preferred, available_ids
+
+    for model_id in available_ids:
+        if model_id.startswith('claude-'):
+            return model_id, available_ids
+
+    return None, available_ids
 
 
 def all_blogs(request):
@@ -120,35 +148,32 @@ def identify(request):
             )
 
         client = anthropic.Anthropic(api_key=api_key)
-        response = None
-        model_errors = []
-        for model_name in IDENTIFY_MODEL_FALLBACKS:
-            try:
-                response = client.messages.create(
-                    model=model_name,
-                    max_tokens=900,
-                    system=IDENTIFY_SYSTEM_PROMPT,
-                    messages=[
-                        {
-                            'role': 'user',
-                            'content': content_blocks,
-                        }
-                    ],
-                )
-                break
-            except Exception as model_exc:
-                model_errors.append(f'{model_name}: {model_exc}')
-
-        if response is None:
+        selected_model, available_models = _select_available_model(client)
+        if not selected_model:
             return JsonResponse(
                 {
                     'success': False,
                     'identification': '',
                     'latin_name': '',
-                    'error': 'All model fallbacks failed. ' + ' | '.join(model_errors),
+                    'error': (
+                        'No usable Anthropic model found for this API key. '
+                        f'Available models: {", ".join(available_models) if available_models else "none returned"}'
+                    ),
                 },
                 status=502,
             )
+
+        response = client.messages.create(
+            model=selected_model,
+            max_tokens=900,
+            system=IDENTIFY_SYSTEM_PROMPT,
+            messages=[
+                {
+                    'role': 'user',
+                    'content': content_blocks,
+                }
+            ],
+        )
 
         identification_text = ""
         for block in response.content:
