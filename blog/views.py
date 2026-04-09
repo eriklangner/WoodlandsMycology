@@ -115,7 +115,7 @@ def identify(request):
 
         client = anthropic.Anthropic(api_key=api_key)
         response = client.messages.create(
-            model='claude-3-5-sonnet-20241022',
+            model='claude-3-5-sonnet-latest',
             max_tokens=900,
             system=IDENTIFY_SYSTEM_PROMPT,
             messages=[
