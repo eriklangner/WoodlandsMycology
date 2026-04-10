@@ -50,13 +50,12 @@
 </style>
 {% endblock %}
 
-{% block extra_js %}
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-{% endblock %}
-
 {% block content %}
 <div id="map"></div>
+{% endblock %}
 
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
   var map = L.map('map').setView([30.1704903, -95.5092479], 13);
 
