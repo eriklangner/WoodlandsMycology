@@ -1,39 +1,91 @@
 {% extends "woodlandsmushrooms/base.html" %}
 
-{% block content %}
-
-<!-- Add in the head of your HTML -->
+{% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<html>
-<head>
-    <title>Map of Locations</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-</head>
-<body>
-    <div id="map" style="height: 400px;"></div>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        var map = L.map('map').setView([30.1704903, -95.5092479], 13); // Set your own default location and zoom level
+<style>
+  #map {
+    height: 500px;
+    border-radius: 8px;
+    margin-top: 1rem;
+  }
+  .map-popup {
+    text-align: center;
+    min-width: 140px;
+  }
+  .map-popup img {
+    width: 140px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .map-popup .popup-no-img {
+    width: 140px;
+    height: 100px;
+    background: #e9ecef;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 0.4rem;
+  }
+  .map-popup a {
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    color: #2c7a2c;
+  }
+  .map-popup a:hover {
+    text-decoration: underline;
+  }
+  .map-popup small {
+    display: block;
+    color: #888;
+    font-style: italic;
+    font-size: 0.78rem;
+    margin-top: 0.1rem;
+  }
+</style>
+{% endblock %}
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-            // Add markers
-        {% for MushroomDetail in MushroomDetails %}
-        {% if MushroomDetail.latitude is not None and MushroomDetail.longitude is not None %}
-        L.marker([{{ MushroomDetail.latitude }}, {{ MushroomDetail.longitude }}]).addTo(map)
-            .bindPopup('{{ MushroomDetail.title|escapejs }}');
-        {% endif %}
-        {% endfor %}
-    </script>
-</body>
-</html>
-
-
-
-
-<!-- Add at the end of your body in HTML -->
+{% block extra_js %}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+{% endblock %}
 
+{% block content %}
+<div id="map"></div>
+
+<script>
+  var map = L.map('map').setView([30.1704903, -95.5092479], 13);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  {% for m in MushroomDetails %}
+  {% if m.latitude and m.longitude %}
+  {% with cover=m.cover_photo %}
+  var popupContent = '<div class="map-popup">'
+    {% if cover %}
+    + '<img src="{{ cover.image.url }}" alt="{{ m.title|escapejs }}">'
+    {% elif m.image %}
+    + '<img src="{{ m.image.url }}" alt="{{ m.title|escapejs }}">'
+    {% else %}
+    + '<div class="popup-no-img">&#127812;</div>'
+    {% endif %}
+    + '<a href="/blog/{{ m.pk }}/">{{ m.title|escapejs }}</a>'
+    {% if m.latin_name %}
+    + '<small>{{ m.latin_name|escapejs }}</small>'
+    {% endif %}
+    + '</div>';
+
+  L.marker([{{ m.latitude }}, {{ m.longitude }}])
+    .addTo(map)
+    .bindPopup(popupContent, {maxWidth: 180});
+  {% endwith %}
+  {% endif %}
+  {% endfor %}
+</script>
 {% endblock %}
