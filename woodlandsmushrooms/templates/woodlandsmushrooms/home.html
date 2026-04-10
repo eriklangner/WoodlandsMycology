@@ -1,45 +1,152 @@
-
 {% extends "woodlandsmushrooms/base.html" %}
 
 {% load static %}
 
+{% block extra_css %}
+<style>
+    .hero-section {
+          position: relative;
+          text-align: center;
+          margin-bottom: 2rem;
+    }
+    .hero-section img {
+          max-height: 420px;
+          object-fit: cover;
+          width: 100%;
+          border-radius: 8px;
+    }
+    .hero-overlay {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+          padding: 2rem 1rem 1.5rem;
+          border-radius: 0 0 8px 8px;
+    }
+    .hero-overlay h1 {
+          color: #fff;
+          font-size: 2.8rem;
+          font-weight: 700;
+          margin: 0;
+          text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+    .gallery-card {
+          position: relative;
+          overflow: hidden;
+          border-radius: 8px;
+          cursor: pointer;
+          background: #111;
+          margin-bottom: 1.5rem;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          transition: box-shadow 0.2s;
+    }
+    .gallery-card:hover {
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    .gallery-card img {
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          object-fit: cover;
+          display: block;
+          transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+    .gallery-card:hover img {
+          transform: scale(1.06);
+          opacity: 0.75;
+    }
+    .gallery-card-body {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 0.75rem 1rem;
+          background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
+          color: #fff;
+          transition: padding 0.25s;
+    }
+    .gallery-card:hover .gallery-card-body {
+          padding-bottom: 1.1rem;
+    }
+    .gallery-card-body h5 {
+          margin: 0 0 0.1rem;
+          font-size: 1.05rem;
+          font-weight: 700;
+          line-height: 1.2;
+    }
+    .gallery-card-body small {
+          font-size: 0.8rem;
+          opacity: 0.85;
+          font-style: italic;
+    }
+    .gallery-card-placeholder {
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          background: #e9ecef;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #adb5bd;
+          font-size: 3rem;
+    }
+    .gallery-card a {
+          text-decoration: none;
+          color: inherit;
+    }
+    .section-title {
+          font-size: 1.4rem;
+          font-weight: 600;
+          color: #444;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          margin-bottom: 1.2rem;
+          border-bottom: 2px solid #e9ecef;
+          padding-bottom: 0.5rem;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
 
+<!-- Hero Section -->
+<div class="hero-section mt-3">
+    <img src="{% static 'woodlandsmushrooms/YggdrasilMushroom.jpeg' %}" alt="Mushrooms of The Woodlands">
+    <div class="hero-overlay">
+          <h1>Mushrooms of The Woodlands, TX</h1>
+    </div>div>
+</div>div>
 
-
-
-
-
-<div class="row justify-content-center my-3">
-  <div class="col-5">
-    <img src="{% static 'woodlandsmushrooms/YggdrasilMushroom.jpeg' %}" class="img-fluid">
-  </div>
-</div>
-
-<div class="row justify-content-center mb-3">
-  <div class="col-md-12 text-center">
-    <h3 id="hometext" class="font-weight-bold">Mushrooms of The Woodlands, TX</h3>
-  </div>
-</div>
-
-<h2 class="mt-5">Mushrooms</h2>
-<hr>
+<!-- Gallery Section -->
+{% if mushrooms %}
+<p class="section-title">Recent Finds</p>p>
 <div class="row">
-
-
-{% for Mushroom in mushrooms %}
-  <div class="col-lg-4 col-md-6">
-
-<h2>{{ Mushroom.title }}</h2>
-<p>{{ Mushroom.description }}</p>
-<img src="{{ Mushroom.image.url }}" alt="" style="width:100%; aspect-ratio:1/1; object-fit:cover;">
-<br>
-{% if Mushroom.url %}
-<a href="{{ Mushroom.url }}"> Link </a>
+  {% for mushroom in mushrooms %}
+  <div class="col-lg-3 col-md-4 col-sm-6">
+      <div class="gallery-card">
+            <a href="{% url 'blog:detail' mushroom.pk %}">
+                    {% with cover=mushroom.cover_photo %}
+                      {% if cover %}
+                        <img src="{{ cover.image.url }}" alt="{{ mushroom.title }}">
+                      {% elif mushroom.image %}
+                        <img src="{{ mushroom.image.url }}" alt="{{ mushroom.title }}">
+                      {% else %}
+                        <div class="gallery-card-placeholder">&#127812;</div>div>
+                      {% endif %}
+                    {% endwith %}
+                    <div class="gallery-card-body">
+                              <h5>{{ mushroom.title }}</h5>
+                              {% if mushroom.latin_name %}
+                              <small>{{ mushroom.latin_name }}</small>
+                              {% endif %}
+                    </div>div>
+            </a>a>
+      </div>div>
+  </div>div>
+  {% endfor %}
+</div>div>
+{% else %}
+<p class="text-muted mt-4">No mushroom finds yet. <a href="{% url 'blog:new_find' %}">Add the first one!</a>a></p>p>
 {% endif %}
 
-    </div>
-{% endfor %}
-</div>
-
-{% endblock %}
+{% endblock %}</small></h5></h1>
+</style>
