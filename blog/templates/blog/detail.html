@@ -22,6 +22,21 @@
     display: block;
     border-radius: 4px;
   }
+  .detail-latin {
+    font-style: italic;
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  .detail-description {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+  .detail-date {
+    color: #999;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
 </style>
 {% endblock %}
 
@@ -52,9 +67,13 @@
 </div>
 
 <br>
-{% if blog.url %}
-<a href="{{ blog.url }}">Link</a>
-<br>
+
+{% if blog.latin_name %}
+<p class="detail-latin">{{ blog.latin_name }}</p>
+{% endif %}
+
+{% if blog.description %}
+<div class="detail-description">{{ blog.description|safe }}</div>
 {% endif %}
 
 {% if blog.ai_identification %}
@@ -67,8 +86,10 @@
 </div>
 {% endif %}
 
-{{ blog.latin_name }}<br>
-{{ blog.description|safe }}<br>
-{{ blog.date }}
+{% if blog.url %}
+<a href="{{ blog.url }}">Link</a><br>
+{% endif %}
+
+<p class="detail-date">{{ blog.date }}</p>
 
 {% endblock %}
